@@ -26,6 +26,10 @@ class AppVisitas:
         self._crear_widgets()
         self.actualizar_tabla()
 
+    # Evitamos que el usuario coloque más de 10 caracteres en el entry
+    def _validar_cedula(self, texto):
+        return (texto.isdigit() and len(texto) <= 10) or texto == ""
+
     def _crear_widgets(self):
         """
         Define la disposición de los componentes visuales en la ventana.
@@ -35,9 +39,15 @@ class AppVisitas:
         frame_entrada = tk.LabelFrame(self.root, text="Datos del Visitante", padx=10, pady=10)
         frame_entrada.pack(fill="x", padx=10, pady=5)
 
+        vcmd = (self.root.register(self._validar_cedula), '%P')
+
         # Campos de texto (Entry) con sus respectivas etiquetas (Labels)
         tk.Label(frame_entrada, text="Cédula:").grid(row=0, column=0, sticky="w")
-        self.entry_cedula = tk.Entry(frame_entrada)
+        self.entry_cedula = tk.Entry(
+            frame_entrada,
+            validate='key',
+            validatecommand=vcmd
+        )
         self.entry_cedula.grid(row=0, column=1, padx=5, pady=2)
 
         tk.Label(frame_entrada, text="Nombre:").grid(row=1, column=0, sticky="w")
@@ -72,6 +82,11 @@ class AppVisitas:
         cedula = self.entry_cedula.get()
         nombre = self.entry_nombre.get()
         motivo = self.entry_motivo.get()
+
+        # Validamos mediante un if que el usuario no coloque menos de 10 dígitos en la cédula
+        if len(cedula) != 10:
+            messagebox.showerror("Error", "La cédula debe tener exactamente 10 dígitos")
+            return
 
         # Validación simple de presencia de datos
         if not (cedula and nombre and motivo):
